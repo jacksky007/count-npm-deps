@@ -1,13 +1,14 @@
 'use strict'
 
 let exec = require('child_process').exec
-                                                                            ;(new Promise((resolve, reject) =>
-                                                                              // find all subdirs named "node_modules"
-  exec('find . -name node_modules -type d', (err, stdout, stderr) =>
+;(new Promise((resolve, reject) =>
+  // find all subdirs named "node_modules"
+  exec(`find ${process.argv[2] || '.'} -name node_modules -type d`, (err, stdout, stderr) =>
     resolve(stdout.split('\n'))
   )
 )).then(nodeModulesDirs => {
-  return Promise.all(nodeModulesDirs.map(dir =>
+  // ignore empty result
+  return Promise.all(nodeModulesDirs.filter(dirs => !!dirs.length).map(dir =>
     new Promise((resolve, reject) => {
       // list one-level subdirs except hidden ones
       const cmd = `find ${dir} -depth 1 -type d ! -iname ".*"`
